@@ -1,0 +1,495 @@
+URL
+The URL to use is:
+
+https://api.bitfinex.com/v1
+The number of requests is limited to 60 per minute.
+
+Authentication
+Authentication is done using an API key and a secret. To generate this pair, go to the API page
+
+Say the client wants to make a request to
+
+POST https://api.bitfinex.com/v1/order/new
+With a payload of
+
+{
+"request": "/v1/order/new",
+"nonce": "1234",
+"option1": ...
+}
+The nonce provided must be strictly increasing.
+
+To authenticate a request, use the following:
+
+payload = parameters-dictionary -> JSON encode -> base64
+signature = HMAC-SHA384(payload, api-secret) as hexadecimal
+send (api-key, payload, signature)
+These are encoded as HTTP headers named:
+
+X-BFX-APIKEY
+X-BFX-PAYLOAD
+X-BFX-SIGNATURE
+Parameters nomenclature
+Requests parameters for POST requests (authenticated) (presented below in the "Request" sections) are part of the PAYLOAD, not GET parameters.
+
+Requests parameters for GET requests (non-authenticated) are GET parameters, appended to the call URL like this:
+
+/v1/call/?paraneter=value
+
+Unauthenticated Calls
+Ticker
+GET /pubticker/:symbol
+Gives innermost bid and asks and information on the most recent trade, as well as high, low and volume of the last 24 hours.
+
+Response:
+Key	Type	Description
+mid	[price]	(bid + ask) / 2
+bid	[price]	Innermost bid.
+ask	[price]	Innermost ask.
+last_price	[price]	The price at which the last order executed.
+low	[price]	Lowest trade price of the last 24 hours
+high	[price]	Highest trade price of the last 24 hours
+volume	[price]	Trading volume of the last 24 hours
+timestamp	[time]	The timestamp at which this information was valid.
+Stats
+GET /stats/:symbol
+Various statistics about the requested pairs.
+
+Response
+An array of the following:
+
+Key	Type	Description
+period	[integer]	period covered in days
+volume	[price]	
+Lendbook
+Get the full lend book:
+
+GET /lendbook/:currency
+Request:
+Key	Required	Type	Default	Description
+limit_bids	false	[int]	50	Limit the number of bids (loan demands) returned. May be 0 in which case the array of bids is empty.
+limit_asks	false	[int]	50	Limit the number of asks (loan offers) returned. May be 0 in which case the array of asks is empty.
+Response
+Key	Type	Description
+bids	[array of loan demands]	
+rate	[rate in % per 365 days]	
+amount	[decimal]	
+period	[days]	minimum period for the loan
+timestamp	[time]	
+frr	[yes/no]	"Yes" if the offer is at Flash Return Rate, "No" if the offer is at fixed rate
+asks	[array of loan offers]	
+rate	[rate in % per 365 days]	
+amount	[decimal]	
+period	[days]	maximum period for the loan
+timestamp	[time]	
+frr	[yes/no]	"Yes" if the offer is at Flash Return Rate, "No" if the offer is at fixed rate
+Orderbook
+Get the full order book.
+
+GET /book/:symbol
+Request:
+Key	Required	Type	Default	Description
+limit_bids	false	[int]	50	Limit the number of bids returned. May be 0 in which case the array of bids is empty.
+limit_asks	false	[int]	50	Limit the number of asks returned. May be 0 in which case the array of asks is empty.
+group	false	[0/1]	1	If 1, orders are grouped by price in the orderbook. If 0, orders are not grouped and sorted individually
+Response
+Key	Type
+bids	[array]
+price	[price]
+amount	[decimal]
+timestamp	[time]
+asks	[array]
+price	[price]
+amount	[decimal]
+timestamp	[time]
+Trades
+Get a list of the most recent trades for the given symbol.
+
+GET /trades/:symbol
+Request
+Key	Required	Type	Default	Description
+timestamp	false	[time]		Only show trades at or after this timestamp.
+limit_trades	false	[int]	50	Limit the number of trades returned. Must be >= 1.
+Response
+Key	Type	Description
+tid	[integer]	
+timestamp	[time]	
+price	[price]	
+amount	[decimal]	
+exchange	[string]	
+type	[string]	"sell" or "buy" (can be "" if undetermined)
+Lends
+Get a list of the most recent swaps data for the given currency: total amount lent and Flash Return Rate (in % by 365 days) over time.
+
+GET /lends/:currency
+Request
+Key	Required	Type	Default	Description
+timestamp	false	[time]		Only show data at or after this timestamp.
+limit_lends	false	[int]	50	Limit the number of swaps data returned. Must be >= 1
+Response
+Key	Type	Description
+rate	[decimal, % by 365 days]	Average rate of total swaps opened at fixed rates, ie past Flash Return Rate annualized
+amount_lent	[decimal]	Total amount of open swaps in the given currency
+amount_used	[decimal]	Total amount of open swaps used in a margin position in the given currency
+timestamp	[time]	
+Symbols
+Get a list of valid symbol IDs.
+
+GET /symbols
+Response
+A list of symbol names. Currently "btcusd", "ltcusd", "ltcbtc".
+
+Symbols Details
+Get a list of valid symbol IDs and the pair details.
+
+GET /symbols_details
+Response
+Key	Type	Description
+pair	[string]	the pair code
+price_precision	[integer]	Maximum number of significant digits for price in this pair
+initial_margin	[decimal]	Initial margin required to open a position in this pair
+minimum_margin	[decimal]	Minimal margin to maintain (in %)
+maximum_order_size	[decimal]	Maximum order size of the pair
+expiration	[string]	Expiration date for limited contracts/pairs
+Authenticated Calls
+New deposit
+Return your deposit address to make a new deposit.
+
+POST /deposit/new
+Request
+Key	Type	Description
+method	[string]	Method of deposit (methods accepted: "bitcoin", "litecoin", "darkcoin", "mastercoin" (tethers)).
+wallet_name	[string]	Wallet to deposit in (accepted: "trading", "exchange", "deposit"). Your wallet needs to already exist
+renew	[integer]	(optional) Default is 0. If set to 1, will return a new unused deposit address
+Response
+Key	Type	Description
+result	[string]	"success" or "error"
+method	[string]	
+currency	[string]	
+address	[string]	The deposit address (or error message if result = "error")
+New order
+Submit a new order.
+
+POST /order/new
+Request
+Key	Type	Description
+symbol	[string]	The name of the symbol (see `/symbols`).
+amount	[decimal]	Order size: how much to buy or sell.
+price	[price]	Price to buy or sell at. Must be positive. Use random number for market orders.
+exchange	[string]	"bitfinex"
+side	[string]	Either "buy" or "sell".
+type	[string]	Either "market" / "limit" / "stop" / "trailing-stop" / "fill-or-kill" / "exchange market" / "exchange limit" / "exchange stop" / "exchange trailing-stop" / "exchange fill-or-kill". (type starting by "exchange " are exchange orders, others are margin trading orders)
+is_hidden	[bool]	true if the order should be hidden. Default is false.
+Response
+Key	Type	Description
+order_id	[int]	A randomly generated ID for the order and the information given by /order/status.
+Order types
+Margin trading type	Exchange type
+LIMIT	EXCHANGE LIMIT
+MARKET	EXCHANGE MARKET
+STOP	EXCHANGE STOP
+TRAILING STOP	EXCHANGE TRAILING STOP
+FILL-OR-KILL	EXCHANGE FILL-OR-KILL
+Multiple new orders
+Submit several new orders at once.
+
+POST /order/new/multi
+Request
+The request is an array of the array containing the order options sent with the previous call /order/new. That is an array named "orders", containing the following array:
+
+Key	Type	Description
+symbol	[string]	The name of the symbol (see `/symbols`).
+amount	[decimal]	Order size: how much to buy or sell.
+price	[price]	Price to buy or sell at. May omit if a market order.
+exchange	[string]	"bitfinex", "bitstamp", "all" (for no routing).
+side	[string]	Either "buy" or "sell".
+type	[string]	Either "market" / "limit" / "stop" / "trailing-stop" / "fill-or-kill".
+Important: You can not place more than 10 orders at once.
+
+Response
+Key	Type	Description
+order_ids	[array]	An array of generated IDs and given by /order/status for each of the orders opened.
+Cancel order
+Cancel an order.
+
+POST /order/cancel
+Request
+Key	Type	Description
+order_id	[int]	The order ID given by `/order/new`.
+Response
+Result of /order/status for the cancelled order.
+
+Cancel multiple orders
+Cancel multiples orders at once.
+
+POST /order/cancel/multi
+Request
+Key	Type	Description
+order_ids	[array]	An array of the order IDs given by `/order/new` or `/order/new/multi`
+Response
+Confirmation of cancellation of the orders.
+
+Cancel all active orders
+Cancel all active orders at once.
+
+GET /order/cancel/all
+Response
+Confirmation of cancellation of all active orders.
+
+Replace order
+Replace an order with a new one.
+
+POST /order/cancel/replace
+Request
+Key	Type	Description
+order_id	[int]	The order ID (to be replaced) given by `/order/new`.
+symbol	[string]	The name of the symbol (see `/symbols`).
+amount	[decimal]	Order size: how much to buy or sell.
+price	[price]	Price to buy or sell at. May omit if a market order.
+exchange	[string]	"bitfinex", "bitstamp", "all" (for no routing).
+side	[string]	Either "buy" or "sell".
+type	[string]	Either "market" / "limit" / "stop" / "trailing-stop" / "fill-or-kill" / "exchange market" / "exchange limit" / "exchange stop" / "exchange trailing-stop" / "exchange fill-or-kill". (type starting by "exchange " are exchange orders, others are margin trading orders)
+is_hidden	[bool]	true if the order should be hidden. Default is false.
+Response
+Key	Type	Description
+order_id	[int]	A randomly generated ID for the order and the information given by /order/status.
+Order types
+See "/order/new"
+Order status
+Get the status of an order. Is it active? Was it cancelled? To what extent has it been executed? etc.
+
+POST /order/status
+Request
+Key	Type	Description
+order_id	[int]	The order ID given by `/order/new`
+Response
+Key	Type	Description
+symbol	[string]	The symbol name the order belongs to.
+exchange	[string]	"bitfinex", "bitstamp".
+price	[decimal]	The price the order was issued at (can be null for market orders).
+avg_execution_price	[decimal]	The average price at which this order as been executed so far. 0 if the order has not been executed at all.
+side	[string]	Either "buy" or "sell".
+type	[string]	Either "market" / "limit" / "stop" / "trailing-stop".
+timestamp	[time]	The timestamp the order was submitted.
+is_live	[bool]	Could the order still be filled?
+is_cancelled	[bool]	Has the order been cancelled?
+is_hidden	[bool]	Is the order hidden?
+was_forced	[bool]	For margin only true if it was forced by the system.
+executed_amount	[decimal]	How much of the order has been executed so far in its history?
+remaining_amount	[decimal]	How much is still remaining to be submitted?
+original_amount	[decimal]	What was the order originally submitted for?
+Active Orders
+View your active orders.
+
+POST /orders
+Response
+An array of the results of `/order/status` for all your live orders.
+
+Active Positions
+View your active positions.
+
+POST /positions
+Response
+An array of your active positions.
+
+Claim position
+Claim a position.
+
+POST /position/claim
+A position can be claimed if:
+
+It is a long position: The amount in the last unit of the position pair that you have in your trading wallet AND/OR the realized profit of the position is greater or equal to the purchase amount of the position (base price * position amount) and the pending swap. For example, for a long BTCUSD position, you can claim the position if the amount of USD you have in the trading wallet is greater than the base price * the position amount and the unrealized swap.
+It is a short position: The amount in the first unit of the position pair that you have in your trading wallet is greater or equal to the amount of the position and the pending swap.
+Request
+Key	Type	Description
+position_id	[int]	The position ID given by `/positions`.
+Response
+Status of the position for the claimed position, if the position could be claimed.
+
+Balance history
+View all of your balance ledger entries.
+
+POST /history
+Request
+Key	Type	Description
+currency	[string]	The currency to look for.
+since	[time]	Optional. Return only the history after this timestamp.
+until	[time]	Optional. Return only the history before this timestamp.
+limit	[int]	Optional. Limit the number of entries to return. Default is 500.
+wallet	[string]	Optional. Return only entries that took place in this wallet. Accepted inputs are: "trading", "exchange", "deposit".
+Response
+Key	Type	Description
+currency	[string]	Currency
+amount	[decimal]	Positive (credit) or negative (debit)
+balance	[decimal]	Wallet balance after the current entry
+description	[string]	Description of the entry. Includes the wallet in which the operation took place
+timestamp	[time]	Timestamp of the entry
+Deposits and withdrawals history
+View your past deposits/withdrawals.
+
+POST /history/movements
+Request
+Key	Type	Description
+currency	[string]	The currency to look for.
+method	[string]	Optional. The method of the deposit/withdrawal (can be "bitcoin", "litecoin", "darkcoin", "wire").
+since	[time]	Optional. Return only the history after this timestamp.
+until	[time]	Optional. Return only the history before this timestamp.
+limit	[int]	Optional. Limit the number of entries to return. Default is 500.
+Response
+An array of histories:
+
+Key	Type	Description
+currency	[string]	
+method	[string]	
+type	[string]	
+amount	[decimal]	Absolute value of the movement
+description	[string]	Description of the movement (txid, destination address,,,,)
+status	[string]	Status of the movement
+timestamp	[time]	Timestamp of the movement
+Past trades
+View your past trades.
+
+POST /mytrades
+Request
+Key	Type	Description
+symbol	[string]	The pair traded (BTCUSD, LTCUSD, LTCBTC).
+timestamp	[time]	Trades made before this timestamp won't be returned.
+until	[time]	Optional. Trades made after this timestamp won't be returned.
+limit_trades	[int]	Optional. Limit the number of trades returned. Default is 50.
+reverse	[int]	Optional. Return trades in reverse order (the oldest comes first). Default is returning newest trades first.
+Response
+An array of trades:
+
+Key	Type	Description
+price	[price]	
+amount	[decimal]	
+timestamp	[time]	return only trades after or at the time specified here
+until	[time]	return only trades before or a the time specified here
+exchange	[string]	
+type	[string]	Sell or Buy
+fee_currency	[string]	Currency you paid this trade's fee in
+fee_amount	[decimal]	Amount of fees you paid for this trade
+tid	[integer]	unique identification number of the trade
+order_id	[integer]	unique identification number of the parent order of the trade
+New offer (lending or borrowing)
+Submit a new offer.
+
+POST /offer/new
+Request
+Key	Type	Description
+currency	[string]	The name of the currency.
+amount	[decimal]	Offer size: how much to lend or borrow.
+rate	[decimal]	Rate to lend or borrow at. In percentage per 365 days.
+period	[integer]	Number of days of the loan (in days)
+direction	[string]	Either "lend" or "loan".
+Response
+Key	Type	Description
+offer_id	[int]	A randomly generated ID for the offer and the information given by /offer/status
+Cancel offer
+Cancel an offer.
+
+POST /offer/cancel
+Request
+Key	Type	Description
+offer_id	[int]	The offer ID given by `/offer/new`.
+Response
+Result of /offer/status for the cancelled offer.
+
+Offer status
+Get the status of an offer. Is it active? Was it cancelled? To what extent has it been executed? etc.
+
+POST /offer/status
+Request
+Key	Type	Description
+offer_id	[int]	The offer ID given by `/offer/new`.
+Response
+Key	Type	Description
+currency	[string]	The currency name of the offer.
+rate	[decimal]	The rate the offer was issued at (in % per 365 days).
+period	[integer]	The number of days of the offer.
+direction	[string]	Either "lend" or "loan".
+type	[string]	Either "market" / "limit" / "stop" / "trailing-stop".
+timestamp	[time]	The timestamp the offer was submitted.
+is_live	[bool]	Could the offer still be filled?
+is_cancelled	[bool]	Has the offer been cancelled?
+executed_amount	[decimal]	How much of the offer has been executed so far in its history?
+remaining_amount	[decimal]	How much is still remaining to be submitted?
+original_amount	[decimal]	What was the offer originally submitted for?
+Active Offers
+View your active offers.
+
+POST /offers
+Response
+An array of the results of `/offer/status` for all your live offers (lending or borrowing).
+
+Active Credits
+View your funds currently lent (active credits).
+
+POST /credits
+Response
+An array of your active credits.
+
+Active Swaps used in a margin position
+View your funds currently borrowed and used in a margin position (active taken swaps).
+
+POST /taken_swaps
+Response
+An array of your active taken swaps.
+
+Total of your active swaps used
+View the total of your active swaps used in your position(s).
+
+POST /total_taken_swaps
+Response
+An array of the following:
+
+Key	Type	Description
+position_pair	[string]	Pair of the position
+total_swaps	[decimal]	Sum of the active swaps backing this position
+Close swap
+Close a swap taken in a margin position
+
+POST /swap/close
+Request
+Key	Type	Description
+swap_id	[int]	The swap ID given by `/taken_swaps`.
+Response
+Status of the swap closed if it could be closed.
+
+Wallet Balances
+See your balances.
+
+POST /balances
+Response
+A list of wallet balances:
+
+Key	Type	Description
+type	[string]	"trading", "deposit" or "exchange".
+currency	[string]	Currency
+amount	[decimal]	How much balance of this currency in this wallet
+available	[decimal]	How much X there is in this wallet that is available to trade.
+Account informations
+Return information about your account (trading fees).
+
+POST /account_infos
+Response
+Key	Type	Description
+pairs	[string]	The currency included in the pairs with this fee schedule
+maker_fees	[decimal]	Your current fees for maker orders (limit orders not marketable, in percent)
+taker_fees	[decimal]	Your current fees for taker orders (marketable order, in percent)
+Margin information
+See your trading wallet information for margin trading.
+
+POST /margin_infos
+Response
+Key	Type	Description
+margin_balance	[decimal]	the USD value of all your trading assets (based on last prices)
+unrealized_pl	[decimal]	The unrealized profit/loss of all your open positions
+unrealized_swap	[decimal]	The unrealized swap of all your open positions
+net_value	[decimal]	Your net value (the USD value of your trading wallet, including your margin balance, your unrealized P/L and swap)
+required_margin	[decimal]	The minimum net value to maintain in your trading wallet, under which all of your positions are fully liquidated
+margin_limits	[array]	The list of margin limits for each pair. The array gives you the following information, for each pair:
+on_pair	[string]	The pair for which these limits are valid
+initial_margin	[decimal]	The minimum margin (in %) to maintain to open or increase a position
+tradable_balance	[decimal]	Your tradable balance in USD (the maximum size you can open on leverage for this pair)
+margin_requirements	[decimal]	The maintenance margin (% of the USD value of all of your open positions in the current pair to maintain)
