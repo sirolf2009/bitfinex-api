@@ -4,4 +4,4 @@ machine:
 
 test:
   override:
-    - mvn  -f bitfinex/pom.xml clean deploy
+    - mvn  -f bitfinex/pom.xml clean install
