@@ -1,11 +1,13 @@
 package com.sirolf2009.bitfinex;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClients;
 
+import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 import com.sirolf2009.bitfinex.calls.BitfinexCall;
 import com.sirolf2009.bitfinex.calls.Lendbook;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
@@ -19,6 +21,8 @@ import com.sirolf2009.bitfinex.calls.auth.NewOrder;
 import com.sirolf2009.bitfinex.calls.auth.NewOrder.NewOrderResponse;
 import com.sirolf2009.bitfinex.calls.auth.OrderStatus;
 import com.sirolf2009.bitfinex.calls.auth.OrderStatus.OrderStatusResponse;
+import com.sirolf2009.bitfinex.calls.auth.Trades;
+import com.sirolf2009.bitfinex.calls.auth.Trades.TradesResponse;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 import com.sirolf2009.bitfinex.exceptions.BitfinexInitializationException;
 
@@ -29,6 +33,14 @@ public class Bitfinex {
 	public Bitfinex() {
 		client = HttpClients.createDefault();
 	}
+	
+	/* MID LEVEL FUNCTIONS */
+	
+	public CandleStick getLatestCandleStick(Symbols symbol, long timeFrame) throws NumberFormatException, BitfinexCallException, IOException {
+		return CandlestickMapReduce.mapReduce(timeFrame, trades(symbol, System.currentTimeMillis()-timeFrame)).get(0);
+	}
+	
+	/* LOW LEVEL FUNCTIONS */
 	
 	public TickerResponse ticker(Symbols symbol) throws BitfinexCallException {
 		return (TickerResponse) call(new Ticker(symbol));
@@ -68,6 +80,26 @@ public class Bitfinex {
 
 	public OrderStatusResponse orderStatus(int orderID) throws BitfinexCallException {
 		return (OrderStatusResponse) call(new OrderStatus(orderID));
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TradesResponse> trades(Symbols symbol) throws BitfinexCallException {
+		return (List<TradesResponse>) call(new Trades(symbol));
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TradesResponse> trades(Symbols symbol, int count) throws BitfinexCallException {
+		return (List<TradesResponse>) call(new Trades(symbol, count));
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TradesResponse> trades(Symbols symbol, long timestamp) throws BitfinexCallException {
+		return (List<TradesResponse>) call(new Trades(symbol, timestamp));
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<TradesResponse> trades(Symbols symbol, int count, long timestamp) throws BitfinexCallException {
+		return (List<TradesResponse>) call(new Trades(symbol, timestamp, count));
 	}
 	
 	private Object call(BitfinexCall call) throws BitfinexCallException {

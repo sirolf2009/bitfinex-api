@@ -1,0 +1,85 @@
+package com.sirolf2009.bitfinex;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import com.sirolf2009.bitfinex.calls.auth.Trades.TradesResponse;
+
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
+public class CandlestickMapReduce {
+
+	public static List<CandleStick> mapReduce(long timeFrame, List<TradesResponse> trades) throws NumberFormatException, IOException {
+		log.trace("Creating Bitcoin chart history with timeFrame="+timeFrame);
+
+		log.trace("Mapping...");
+		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame)).collect(Collectors.groupingBy((CandleStick candle) -> candle.getPositionInChart()));
+		log.trace("Reducing...");
+		Map<Long, CandleStick> reducedCandles = new HashMap<Long, CandleStick>();
+		for(Entry<Long, List<CandleStick>> entry : candles.entrySet()) {
+			CandleStick reducedCandle = null;
+			for(CandleStick candle : entry.getValue()) {
+				if(reducedCandle == null) {
+					reducedCandle = candle;
+				} else {
+					reducedCandle = merge(reducedCandle, candle);
+				}
+			}
+			reducedCandles.put(reducedCandle.positionInChart, reducedCandle);
+		}
+		log.trace("Finalizing...");
+		reducedCandles.values().forEach(candle -> calculateOHLCV(candle));
+
+		return reducedCandles.values().stream().sorted((trade1, trade2) -> new Long(trade1.open.getTime()).compareTo(trade2.open.getTime())).collect(Collectors.toList());
+	}
+
+	public static CandleStick merge(CandleStick candle1, CandleStick candle2) {
+		CandleStick candle = new CandleStick();
+		candle.setPositionInChart(candle1.getPositionInChart());
+		candle.setTrades(candle1.getTrades());
+		candle.getTrades().addAll(candle2.getTrades());
+		return candle;
+	}
+
+	public static void calculateOHLCV(CandleStick candle) {
+		candle.open = candle.getTrades().stream().min((trade1, trade2) -> new Long(trade1.getTime()).compareTo(trade2.getTime())).get();
+		candle.high = candle.getTrades().stream().max((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
+		candle.low = candle.getTrades().stream().min((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
+		candle.close = candle.getTrades().stream().max((trade1, trade2) -> new Long(trade1.getTime()).compareTo(trade2.getTime())).get();
+		candle.volume = candle.getTrades().stream().mapToDouble(trade -> trade.getAmount()).sum();
+	}
+
+	@Data
+	public static class CandleStick {
+		
+		private long positionInChart;
+		private List<TradesResponse> trades;
+		private TradesResponse open;
+		private TradesResponse high;
+		private TradesResponse low;
+		private TradesResponse close;
+		private double volume;
+
+		public CandleStick() {
+		}
+
+		public CandleStick(TradesResponse trade, long timeFrame) {
+			trades = new ArrayList<TradesResponse>();
+			trades.add(trade);
+			positionInChart = trade.getTime()/timeFrame;
+		}
+
+		@Override
+		public String toString() {
+			return open.getTime()+","+open.getPrice()+","+high.getPrice()+","+low.getPrice()+","+close.getPrice()+","+volume;
+		}
+	}
+
+}
