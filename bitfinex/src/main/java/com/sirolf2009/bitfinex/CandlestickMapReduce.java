@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.sirolf2009.bitfinex.calls.auth.Trades.TradesResponse;
+import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
