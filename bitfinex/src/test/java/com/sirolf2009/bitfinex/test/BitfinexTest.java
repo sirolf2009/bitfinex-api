@@ -2,11 +2,15 @@ package com.sirolf2009.bitfinex.test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.sirolf2009.bitfinex.Bitfinex;
+import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 import com.sirolf2009.bitfinex.Currencies;
 import com.sirolf2009.bitfinex.Symbols;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
@@ -14,6 +18,7 @@ import com.sirolf2009.bitfinex.calls.Lendbook.Loan;
 import com.sirolf2009.bitfinex.calls.Stats.Stat;
 import com.sirolf2009.bitfinex.calls.Stats.StatsResponse;
 import com.sirolf2009.bitfinex.calls.Ticker.TickerResponse;
+import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 
 public class BitfinexTest {
@@ -27,6 +32,30 @@ public class BitfinexTest {
 
 	@After
 	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void testCandlestick() throws BitfinexCallException, NumberFormatException, IOException {
+		CandleStick stick = bitfinex.getLatestCandleStick(Symbols.BTCUSD, 60*60*4);
+		System.out.println(stick.toString());
+		assertTrue("open > 0", stick.getOpen().getPrice() > 0);
+		assertTrue("high > 0", stick.getHigh().getPrice() > 0);
+		assertTrue("low > 0", stick.getLow().getPrice() > 0);
+		assertTrue("close > 0", stick.getClose().getPrice() > 0);
+		assertTrue("OHLC4 > 0", stick.getOHLC4() > 0);
+		assertTrue("trades > 0", stick.getTrades().size() > 0);
+	}
+
+	@Test
+	public void testTrades() throws BitfinexCallException {
+		List<TradesResponse> response = bitfinex.trades(Symbols.BTCUSD);
+		System.out.println(response.toString());
+		assertTrue("response > 0", response.size() > 0);
+		assertTrue("amount > 0", response.get(0).getAmount() > 0);
+		assertTrue("price > 0", response.get(0).getPrice() > 0);
+		assertTrue("tid > 0", response.get(0).getTid() > 0);
+		assertTrue("time > 0", response.get(0).getTimestamp() > 0);
+		assertTrue("type != null", response.get(0).getType() != null);
 	}
 
 	@Test

@@ -18,10 +18,12 @@ public class Trades extends HttpGet implements BitfinexCall {
 
 	public Trades(Symbols symbols) {
 		super(Config.baseUrl+"/trades/"+symbols);
+		System.out.println(getURI());
 	}
 
 	public Trades(Symbols symbols, long timestamp) {
 		super(Config.baseUrl+"/trades/"+symbols+"?timestamp="+timestamp);
+		System.out.println(getURI());
 	}
 
 	public Trades(Symbols symbols, int count) {
@@ -30,6 +32,7 @@ public class Trades extends HttpGet implements BitfinexCall {
 
 	public Trades(Symbols symbols, long timestamp, int count) {
 		super(Config.baseUrl+"/trades/"+symbols+"?timestamp="+timestamp+"&limit_trades="+count);
+		System.out.println(getURI());
 	}
 
 	@Override
@@ -43,7 +46,7 @@ public class Trades extends HttpGet implements BitfinexCall {
 		private static final long serialVersionUID = -4037190389844866185L;
 		
 		private int tid;
-		private long time;
+		private long timestamp;
 		private double price;
 		private double amount;
 		private String exchange;

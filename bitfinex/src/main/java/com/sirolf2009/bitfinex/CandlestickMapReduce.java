@@ -37,7 +37,7 @@ public class CandlestickMapReduce {
 		log.trace("Finalizing...");
 		reducedCandles.values().forEach(candle -> calculateOHLCV(candle));
 
-		return reducedCandles.values().stream().sorted((trade1, trade2) -> new Long(trade1.open.getTime()).compareTo(trade2.open.getTime())).collect(Collectors.toList());
+		return reducedCandles.values().stream().sorted((trade1, trade2) -> new Long(trade1.open.getTimestamp()).compareTo(trade2.open.getTimestamp())).collect(Collectors.toList());
 	}
 
 	public static CandleStick merge(CandleStick candle1, CandleStick candle2) {
@@ -49,10 +49,10 @@ public class CandlestickMapReduce {
 	}
 
 	public static void calculateOHLCV(CandleStick candle) {
-		candle.open = candle.getTrades().stream().min((trade1, trade2) -> new Long(trade1.getTime()).compareTo(trade2.getTime())).get();
+		candle.open = candle.getTrades().stream().min((trade1, trade2) -> new Long(trade1.getTimestamp()).compareTo(trade2.getTimestamp())).get();
 		candle.high = candle.getTrades().stream().max((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
 		candle.low = candle.getTrades().stream().min((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
-		candle.close = candle.getTrades().stream().max((trade1, trade2) -> new Long(trade1.getTime()).compareTo(trade2.getTime())).get();
+		candle.close = candle.getTrades().stream().max((trade1, trade2) -> new Long(trade1.getTimestamp()).compareTo(trade2.getTimestamp())).get();
 		candle.volume = candle.getTrades().stream().mapToDouble(trade -> trade.getAmount()).sum();
 	}
 
@@ -73,13 +73,13 @@ public class CandlestickMapReduce {
 		public CandleStick(TradesResponse trade, long timeFrame) {
 			trades = new ArrayList<TradesResponse>();
 			trades.add(trade);
-			positionInChart = trade.getTime()/timeFrame;
+			positionInChart = trade.getTimestamp()/timeFrame;
+		}
+		
+		public double getOHLC4() {
+			return (open.getPrice()+high.getPrice()+low.getPrice()+close.getPrice())/4;
 		}
 
-		@Override
-		public String toString() {
-			return open.getTime()+","+open.getPrice()+","+high.getPrice()+","+low.getPrice()+","+close.getPrice()+","+volume;
-		}
 	}
 
 }
