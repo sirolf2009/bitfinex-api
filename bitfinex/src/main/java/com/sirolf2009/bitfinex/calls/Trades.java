@@ -30,7 +30,6 @@ public class Trades extends HttpGet implements BitfinexCall {
 
 	public Trades(Symbols symbols, long timestamp, int count) {
 		super(Config.baseUrl+"/trades/"+symbols+"?timestamp="+timestamp+"&limit_trades="+count);
-		System.out.println(getURI());
 	}
 
 	@Override
