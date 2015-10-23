@@ -18,12 +18,10 @@ public class Trades extends HttpGet implements BitfinexCall {
 
 	public Trades(Symbols symbols) {
 		super(Config.baseUrl+"/trades/"+symbols);
-		System.out.println(getURI());
 	}
 
 	public Trades(Symbols symbols, long timestamp) {
 		super(Config.baseUrl+"/trades/"+symbols+"?timestamp="+timestamp);
-		System.out.println(getURI());
 	}
 
 	public Trades(Symbols symbols, int count) {
