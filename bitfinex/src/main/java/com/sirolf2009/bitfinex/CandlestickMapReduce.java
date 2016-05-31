@@ -10,18 +10,10 @@ import java.util.stream.Collectors;
 
 import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 
-import lombok.Data;
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
 public class CandlestickMapReduce {
 
 	public static List<CandleStick> mapReduce(long timeFrame, List<TradesResponse> trades) throws NumberFormatException, IOException {
-		log.trace("Creating Bitcoin chart history with timeFrame="+timeFrame);
-
-		log.trace("Mapping...");
 		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame)).collect(Collectors.groupingBy((CandleStick candle) -> candle.getPositionInChart()));
-		log.trace("Reducing...");
 		Map<Long, CandleStick> reducedCandles = new HashMap<Long, CandleStick>();
 		for(Entry<Long, List<CandleStick>> entry : candles.entrySet()) {
 			CandleStick reducedCandle = null;
@@ -34,7 +26,6 @@ public class CandlestickMapReduce {
 			}
 			reducedCandles.put(reducedCandle.positionInChart, reducedCandle);
 		}
-		log.trace("Finalizing...");
 		reducedCandles.values().forEach(candle -> calculateOHLCV(candle));
 
 		return reducedCandles.values().stream().sorted((trade1, trade2) -> new Long(trade1.open.getTimestamp()).compareTo(trade2.open.getTimestamp())).collect(Collectors.toList());
@@ -56,7 +47,6 @@ public class CandlestickMapReduce {
 		candle.volume = candle.getTrades().stream().mapToDouble(trade -> trade.getAmount()).sum();
 	}
 
-	@Data
 	public static class CandleStick {
 		
 		private long positionInChart;
@@ -78,6 +68,63 @@ public class CandlestickMapReduce {
 		
 		public double getOHLC4() {
 			return (open.getPrice()+high.getPrice()+low.getPrice()+close.getPrice())/4;
+		}
+		
+
+		public long getPositionInChart() {
+			return positionInChart;
+		}
+
+		public void setPositionInChart(long positionInChart) {
+			this.positionInChart = positionInChart;
+		}
+
+		public List<TradesResponse> getTrades() {
+			return trades;
+		}
+
+		public void setTrades(List<TradesResponse> trades) {
+			this.trades = trades;
+		}
+
+		public TradesResponse getOpen() {
+			return open;
+		}
+
+		public void setOpen(TradesResponse open) {
+			this.open = open;
+		}
+
+		public TradesResponse getHigh() {
+			return high;
+		}
+
+		public void setHigh(TradesResponse high) {
+			this.high = high;
+		}
+
+		public TradesResponse getLow() {
+			return low;
+		}
+
+		public void setLow(TradesResponse low) {
+			this.low = low;
+		}
+
+		public TradesResponse getClose() {
+			return close;
+		}
+
+		public void setClose(TradesResponse close) {
+			this.close = close;
+		}
+
+		public double getVolume() {
+			return volume;
+		}
+
+		public void setVolume(double volume) {
+			this.volume = volume;
 		}
 
 	}

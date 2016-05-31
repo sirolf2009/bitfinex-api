@@ -12,8 +12,6 @@ import com.sirolf2009.bitfinex.Symbols;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 import com.sirolf2009.bitfinex.util.CallUtils;
 
-import lombok.Data;
-
 public class Trades extends HttpGet implements BitfinexCall {
 
 	public Trades(Symbols symbols) {
@@ -37,7 +35,6 @@ public class Trades extends HttpGet implements BitfinexCall {
 		return CallUtils.parseResponse(response, new TypeToken<List<TradesResponse>>() {}.getType());
 	}
 	
-	@Data
 	public static class TradesResponse implements Serializable {
 
 		private static final long serialVersionUID = -4037190389844866185L;
@@ -48,6 +45,50 @@ public class Trades extends HttpGet implements BitfinexCall {
 		private double amount;
 		private String exchange;
 		private String type;
+		
+		@Override
+		public String toString() {
+			return "TradesResponse [tid=" + tid + ", timestamp=" + timestamp + ", price=" + price + ", amount=" + amount
+					+ ", exchange=" + exchange + ", type=" + type + "]";
+		}
+
+		public int getTid() {
+			return tid;
+		}
+		public void setTid(int tid) {
+			this.tid = tid;
+		}
+		public long getTimestamp() {
+			return timestamp;
+		}
+		public void setTimestamp(long timestamp) {
+			this.timestamp = timestamp;
+		}
+		public double getPrice() {
+			return price;
+		}
+		public void setPrice(double price) {
+			this.price = price;
+		}
+		public double getAmount() {
+			return amount;
+		}
+		public void setAmount(double amount) {
+			this.amount = amount;
+		}
+		public String getExchange() {
+			return exchange;
+		}
+		public void setExchange(String exchange) {
+			this.exchange = exchange;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		
 		
 	}
 	

@@ -35,6 +35,11 @@ public class Stats extends HttpGet implements BitfinexCall {
 		private int period;
 		private double volume;
 		
+		@Override
+		public String toString() {
+			return "Stat [period=" + period + ", volume=" + volume + "]";
+		}
+		
 		public int getPeriod() {
 			return period;
 		}
@@ -46,17 +51,6 @@ public class Stats extends HttpGet implements BitfinexCall {
 		}
 		public void setVolume(double volume) {
 			this.volume = volume;
-		}
-		
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			builder.append("Stat [period=");
-			builder.append(period);
-			builder.append(", volume=");
-			builder.append(volume);
-			builder.append("]");
-			return builder.toString();
 		}
 		
 	}

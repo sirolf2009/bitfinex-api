@@ -34,6 +34,13 @@ public class Ticker extends HttpGet implements BitfinexCall {
 		private double volume;
 		private double timestamp;
 		
+		
+		@Override
+		public String toString() {
+			return "TickerResponse [mid=" + mid + ", bid=" + bid + ", ask=" + ask + ", last_price=" + last_price
+					+ ", low=" + low + ", high=" + high + ", volume=" + volume + ", timestamp=" + timestamp + "]";
+		}
+		
 		public double getMid() {
 			return mid;
 		}
@@ -81,29 +88,6 @@ public class Ticker extends HttpGet implements BitfinexCall {
 		}
 		public void setTimestamp(double timestamp) {
 			this.timestamp = timestamp;
-		}
-		
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			builder.append("TickerResponse [mid=");
-			builder.append(mid);
-			builder.append(", bid=");
-			builder.append(bid);
-			builder.append(", ask=");
-			builder.append(ask);
-			builder.append(", last_price=");
-			builder.append(last_price);
-			builder.append(", low=");
-			builder.append(low);
-			builder.append(", high=");
-			builder.append(high);
-			builder.append(", volume=");
-			builder.append(volume);
-			builder.append(", timestamp=");
-			builder.append(timestamp);
-			builder.append("]");
-			return builder.toString();
 		}
 		
 	}

@@ -43,6 +43,11 @@ public class Lendbook extends HttpGet implements BitfinexCall {
 		private Loan[] bids;
 		private Loan[] asks;
 		
+		@Override
+		public String toString() {
+			return "LendbookResponse [bids=" + Arrays.toString(bids) + ", asks=" + Arrays.toString(asks) + "]";
+		}
+		
 		public Loan[] getBids() {
 			return bids;
 		}
@@ -54,17 +59,6 @@ public class Lendbook extends HttpGet implements BitfinexCall {
 		}
 		public void setAsks(Loan[] asks) {
 			this.asks = asks;
-		}
-		
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			builder.append("LendbookResponse [bids=");
-			builder.append(Arrays.toString(bids));
-			builder.append(", asks=");
-			builder.append(Arrays.toString(asks));
-			builder.append("]");
-			return builder.toString();
 		}
 		
 	}

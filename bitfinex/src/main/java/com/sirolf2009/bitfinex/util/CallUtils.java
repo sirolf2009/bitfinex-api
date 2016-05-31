@@ -14,9 +14,6 @@ import com.google.gson.JsonSyntaxException;
 import com.sirolf2009.bitfinex.Config;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
 public class CallUtils {
 	
 	public static URIBuilder createUriBuilder(String path) {
@@ -27,7 +24,6 @@ public class CallUtils {
 		try {
 			InputStream stream = response.getEntity().getContent();
 			String content = IOUtils.toString(stream);
-			log.trace("Received\n"+content);
 			stream.close();
 			return new Gson().fromJson(content, responseType);
 		} catch (JsonSyntaxException e) {
