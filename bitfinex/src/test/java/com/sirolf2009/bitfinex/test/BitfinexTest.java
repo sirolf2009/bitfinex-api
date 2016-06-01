@@ -13,6 +13,7 @@ import com.sirolf2009.bitfinex.Bitfinex;
 import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 import com.sirolf2009.bitfinex.Currencies;
 import com.sirolf2009.bitfinex.Symbols;
+import com.sirolf2009.bitfinex.Timeframe;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
 import com.sirolf2009.bitfinex.calls.Lendbook.Loan;
 import com.sirolf2009.bitfinex.calls.Stats.Stat;
@@ -36,7 +37,8 @@ public class BitfinexTest {
 
 	@Test
 	public void testCandlestick() throws BitfinexCallException, NumberFormatException, IOException {
-		CandleStick stick = bitfinex.getLatestCandleStick(Symbols.BTCUSD, 60*60*4);
+		List<CandleStick> candles = bitfinex.getCandlesticks(Symbols.BTCUSD, Timeframe.hours(4));
+		CandleStick stick = candles.get(candles.size()-1);
 		System.out.println(stick.toString());
 		assertTrue("open > 0", stick.getOpen().getPrice() > 0);
 		assertTrue("high > 0", stick.getHigh().getPrice() > 0);

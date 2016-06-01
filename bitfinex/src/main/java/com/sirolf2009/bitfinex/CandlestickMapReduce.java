@@ -1,6 +1,5 @@
 package com.sirolf2009.bitfinex;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +11,7 @@ import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 
 public class CandlestickMapReduce {
 
-	public static List<CandleStick> mapReduce(long timeFrame, List<TradesResponse> trades) throws NumberFormatException, IOException {
+	public static List<CandleStick> mapReduce(Timeframe timeFrame, List<TradesResponse> trades) {
 		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame)).collect(Collectors.groupingBy((CandleStick candle) -> candle.getPositionInChart()));
 		Map<Long, CandleStick> reducedCandles = new HashMap<Long, CandleStick>();
 		for(Entry<Long, List<CandleStick>> entry : candles.entrySet()) {
@@ -30,7 +29,7 @@ public class CandlestickMapReduce {
 
 		return reducedCandles.values().stream().sorted((trade1, trade2) -> new Long(trade1.open.getTimestamp()).compareTo(trade2.open.getTimestamp())).collect(Collectors.toList());
 	}
-
+	
 	public static CandleStick merge(CandleStick candle1, CandleStick candle2) {
 		CandleStick candle = new CandleStick();
 		candle.setPositionInChart(candle1.getPositionInChart());
@@ -56,14 +55,16 @@ public class CandlestickMapReduce {
 		private TradesResponse low;
 		private TradesResponse close;
 		private double volume;
+		private Timeframe timeframe;
 
 		public CandleStick() {
 		}
 
-		public CandleStick(TradesResponse trade, long timeFrame) {
+		public CandleStick(TradesResponse trade, Timeframe timeframe) {
 			trades = new ArrayList<TradesResponse>();
 			trades.add(trade);
-			positionInChart = trade.getTimestamp()/timeFrame;
+			positionInChart = trade.getTimestamp()/timeframe.millis;
+			this.timeframe = timeframe; 
 		}
 		
 		public double getOHLC4() {
@@ -125,6 +126,14 @@ public class CandlestickMapReduce {
 
 		public void setVolume(double volume) {
 			this.volume = volume;
+		}
+		
+		public Timeframe getTimeframe() {
+			return timeframe;
+		}
+		
+		public void setTimeframe(Timeframe timeframe) {
+			this.timeframe = timeframe;
 		}
 
 	}

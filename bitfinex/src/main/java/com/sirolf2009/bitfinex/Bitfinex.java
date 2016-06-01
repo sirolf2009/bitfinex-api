@@ -36,8 +36,20 @@ public class Bitfinex {
 	
 	/* MID LEVEL FUNCTIONS */
 	
-	public CandleStick getLatestCandleStick(Symbols symbol, long timeFrame) throws NumberFormatException, BitfinexCallException, IOException {
-		return CandlestickMapReduce.mapReduce(timeFrame, trades(symbol, System.currentTimeMillis()/1000-timeFrame)).get(0);
+	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe) throws BitfinexCallException {
+		return CandlestickMapReduce.mapReduce(timeframe, trades(symbol));
+	}
+	
+	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe, int count) throws BitfinexCallException {
+		return CandlestickMapReduce.mapReduce(timeframe, trades(symbol, count));
+	}
+	
+	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe, long timestamp) throws BitfinexCallException {
+		return CandlestickMapReduce.mapReduce(timeframe, trades(symbol, timestamp));
+	}
+	
+	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe, int count, long timestamp) throws BitfinexCallException {
+		return CandlestickMapReduce.mapReduce(timeframe, trades(symbol, count, timestamp));
 	}
 	
 	/* LOW LEVEL FUNCTIONS */
