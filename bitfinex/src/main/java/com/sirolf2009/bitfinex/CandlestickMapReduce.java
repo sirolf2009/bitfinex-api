@@ -63,10 +63,17 @@ public class CandlestickMapReduce {
 		public CandleStick(TradesResponse trade, Timeframe timeframe) {
 			trades = new ArrayList<TradesResponse>();
 			trades.add(trade);
-			positionInChart = trade.getTimestamp()/timeframe.millis;
+			positionInChart = Math.floorDiv(trade.getTimestamp(), timeframe.getSeconds());
 			this.timeframe = timeframe; 
 		}
 		
+		@Override
+		public String toString() {
+			return "CandleStick [positionInChart=" + positionInChart + ", trades=" + trades + ", open=" + open
+					+ ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + ", timeframe="
+					+ timeframe + "]";
+		}
+
 		public double getOHLC4() {
 			return (open.getPrice()+high.getPrice()+low.getPrice()+close.getPrice())/4;
 		}

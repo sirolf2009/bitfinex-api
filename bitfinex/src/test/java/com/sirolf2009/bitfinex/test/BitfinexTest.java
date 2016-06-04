@@ -18,7 +18,7 @@ import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
 import com.sirolf2009.bitfinex.calls.Lendbook.Loan;
 import com.sirolf2009.bitfinex.calls.Stats.Stat;
 import com.sirolf2009.bitfinex.calls.Stats.StatsResponse;
-import com.sirolf2009.bitfinex.calls.Ticker.TickerResponse;
+import com.sirolf2009.bitfinex.calls.Pubticker.TickerResponse;
 import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 
@@ -62,7 +62,7 @@ public class BitfinexTest {
 
 	@Test
 	public void testTicker() throws BitfinexCallException {
-		TickerResponse response = bitfinex.ticker(Symbols.BTCUSD);
+		TickerResponse response = bitfinex.pubticker(Symbols.BTCUSD);
 		System.out.println(response.toString());
 		assertTrue("mid > 0", response.getMid() > 0);
 		assertTrue("bid > 0", response.getBid() > 0);

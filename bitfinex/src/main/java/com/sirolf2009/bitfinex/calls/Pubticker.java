@@ -10,9 +10,9 @@ import com.sirolf2009.bitfinex.Symbols;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 import com.sirolf2009.bitfinex.util.CallUtils;
 
-public class Ticker extends HttpGet implements BitfinexCall {
+public class Pubticker extends HttpGet implements BitfinexCall {
 
-	public Ticker(Symbols symbol) {
+	public Pubticker(Symbols symbol) {
 		super(Config.baseUrl+"/pubticker/"+symbol.toString());
 	}
 	

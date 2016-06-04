@@ -2,6 +2,7 @@ package com.sirolf2009.bitfinex;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -14,8 +15,8 @@ import com.sirolf2009.bitfinex.calls.Trades;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
 import com.sirolf2009.bitfinex.calls.Stats;
 import com.sirolf2009.bitfinex.calls.Stats.StatsResponse;
-import com.sirolf2009.bitfinex.calls.Ticker;
-import com.sirolf2009.bitfinex.calls.Ticker.TickerResponse;
+import com.sirolf2009.bitfinex.calls.Pubticker;
+import com.sirolf2009.bitfinex.calls.Pubticker.TickerResponse;
 import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 import com.sirolf2009.bitfinex.calls.auth.MarginInfos;
 import com.sirolf2009.bitfinex.calls.auth.MarginInfos.MarginInfosResponse;
@@ -36,6 +37,18 @@ public class Bitfinex {
 	
 	/* MID LEVEL FUNCTIONS */
 	
+	public void ticker(Symbols symbols, long refreshRate, Consumer<TradesResponse> tradeconsumer) {
+		new Thread(new Ticker(this, symbols, refreshRate, tradeconsumer)).start();
+	}
+	
+	public void candleTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
+		new CandlestickTicker(this, symbols, refreshRate, timeframe, candleconsumer);
+	}
+	
+	public void heikenAshiTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
+		new HACandleTicker(this, symbols, refreshRate, timeframe, candleconsumer);
+	}
+	
 	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe) throws BitfinexCallException {
 		return CandlestickMapReduce.mapReduce(timeframe, trades(symbol));
 	}
@@ -54,8 +67,8 @@ public class Bitfinex {
 	
 	/* LOW LEVEL FUNCTIONS */
 	
-	public TickerResponse ticker(Symbols symbol) throws BitfinexCallException {
-		return (TickerResponse) call(new Ticker(symbol));
+	public TickerResponse pubticker(Symbols symbol) throws BitfinexCallException {
+		return (TickerResponse) call(new Pubticker(symbol));
 	}
 	
 	public StatsResponse stats(Symbols symbol) throws BitfinexCallException {

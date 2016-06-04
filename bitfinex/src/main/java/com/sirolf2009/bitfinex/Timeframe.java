@@ -2,7 +2,7 @@ package com.sirolf2009.bitfinex;
 
 public class Timeframe {
 	
-	long millis;
+	private long millis;
 	
 	public Timeframe(long millis) {
 		this.millis = millis;
@@ -32,6 +32,14 @@ public class Timeframe {
 
 	public void setMillis(long millis) {
 		this.millis = millis;
+	}
+	
+	public long getSeconds() {
+		return millis/1000;
+	}
+	
+	public void setSeconds(long seconds) {
+		this.millis = seconds*1000;
 	}
 
 }
