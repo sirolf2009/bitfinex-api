@@ -63,15 +63,15 @@ public abstract class Config {
 					FileUtils.writeStringToFile(keyFile, new Gson().toJson(new Keys("public", "private")));
 					throw new BitfinexInitializationException("Key file "+keyFile+" did not exist. I created it for you", e);
 				} else {
-					throw new BitfinexInitializationException("Key file "+keyFile+" could not be read", e);
+					throw new BitfinexInitializationException("Key file "+keyFile+" could not be read. Only unauthorized calls are allowed", e);
 				}
 			} catch(JsonSyntaxException e) {
-				throw new BitfinexInitializationException("Key file "+keyFile+" has an invalid format", e);
+				throw new BitfinexInitializationException("Key file "+keyFile+" has an invalid format. Only unauthorized calls are allowed", e);
 			}
 		} catch (IOException e) {
-			throw new BitfinexInitializationException("Could not read or create the properties file", e);
+			throw new BitfinexInitializationException("Could not read or create the properties file. Only unauthorized calls are allowed", e);
 		} catch (ConfigurationException e) {
-			throw new BitfinexInitializationException("Could not parse the properties file", e);
+			throw new BitfinexInitializationException("Could not parse the properties file. Only unauthorized calls are allowed", e);
 		}
 	}
 	

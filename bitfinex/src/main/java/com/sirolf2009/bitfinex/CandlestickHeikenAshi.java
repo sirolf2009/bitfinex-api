@@ -21,7 +21,7 @@ public class CandlestickHeikenAshi {
 		TradesResponse open = trade(candle.getOpen(), previousHACandle == null ? (candle.getOpen().getPrice()+candle.getClose().getPrice())/2 : (previousHACandle.getOpen().getPrice()+previousHACandle.getClose().getPrice())/2);
 		TradesResponse high = trade(candle.getHigh(), previousHACandle == null ? candle.getHigh().getPrice() : Math.max(candle.getHigh().getPrice(), Math.max(open.getPrice(), close.getPrice())));
 		TradesResponse low = trade(candle.getLow(), previousHACandle == null ? candle.getLow().getPrice() : Math.min(candle.getLow().getPrice(), Math.min(open.getPrice(), close.getPrice())));
-		CandleStick HACandle = new CandleStick(open, candle.getTimeframe());
+		CandleStick HACandle = new CandleStick(open, candle.getIndex().getTimeframe());
 		HACandle.setOpen(open);
 		HACandle.setClose(close);
 		HACandle.setHigh(high);

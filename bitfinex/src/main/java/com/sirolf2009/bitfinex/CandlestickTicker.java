@@ -17,7 +17,7 @@ public class CandlestickTicker {
 					candlestick = new CandleStick(t, timeframe);
 				} else {
 					CandleStick newCandle = new CandleStick(t, timeframe);
-					if(newCandle.getPositionInChart() == candlestick.getPositionInChart()) {
+					if(newCandle.getIndex().getPositionInChart() == candlestick.getIndex().getPositionInChart()) {
 						candlestick = CandlestickMapReduce.merge(candlestick, newCandle);
 					} else {
 						tradeConsumer.accept(candlestick);

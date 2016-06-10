@@ -12,7 +12,7 @@ import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 public class CandlestickMapReduce {
 
 	public static List<CandleStick> mapReduce(Timeframe timeFrame, List<TradesResponse> trades) {
-		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame)).collect(Collectors.groupingBy((CandleStick candle) -> candle.getPositionInChart()));
+		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame)).collect(Collectors.groupingBy((CandleStick candle) -> candle.getIndex().getPositionInChart()));
 		Map<Long, CandleStick> reducedCandles = new HashMap<Long, CandleStick>();
 		for(Entry<Long, List<CandleStick>> entry : candles.entrySet()) {
 			CandleStick reducedCandle = null;
@@ -23,7 +23,7 @@ public class CandlestickMapReduce {
 					reducedCandle = merge(reducedCandle, candle);
 				}
 			}
-			reducedCandles.put(reducedCandle.positionInChart, reducedCandle);
+			reducedCandles.put(reducedCandle.getIndex().getPositionInChart(), reducedCandle);
 		}
 		reducedCandles.values().forEach(candle -> calculateOHLCV(candle));
 
@@ -32,7 +32,7 @@ public class CandlestickMapReduce {
 	
 	public static CandleStick merge(CandleStick candle1, CandleStick candle2) {
 		CandleStick candle = new CandleStick();
-		candle.setPositionInChart(candle1.getPositionInChart());
+		candle.setIndex(new Index(Math.min(candle1.index.getMillis(), candle2.index.getMillis()), candle1.getIndex().getTimeframe()));
 		candle.setTrades(candle1.getTrades());
 		candle.getTrades().addAll(candle2.getTrades());
 		return candle;
@@ -48,14 +48,13 @@ public class CandlestickMapReduce {
 
 	public static class CandleStick {
 		
-		private long positionInChart;
 		private List<TradesResponse> trades;
 		private TradesResponse open;
 		private TradesResponse high;
 		private TradesResponse low;
 		private TradesResponse close;
 		private double volume;
-		private Timeframe timeframe;
+		private Index index;
 
 		public CandleStick() {
 		}
@@ -63,28 +62,11 @@ public class CandlestickMapReduce {
 		public CandleStick(TradesResponse trade, Timeframe timeframe) {
 			trades = new ArrayList<TradesResponse>();
 			trades.add(trade);
-			positionInChart = Math.floorDiv(trade.getTimestamp(), timeframe.getSeconds());
-			this.timeframe = timeframe; 
-		}
-		
-		@Override
-		public String toString() {
-			return "CandleStick [positionInChart=" + positionInChart + ", trades=" + trades + ", open=" + open
-					+ ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + ", timeframe="
-					+ timeframe + "]";
+			this.index = new Index(trade.getTimestamp(), timeframe);
 		}
 
 		public double getOHLC4() {
 			return (open.getPrice()+high.getPrice()+low.getPrice()+close.getPrice())/4;
-		}
-		
-
-		public long getPositionInChart() {
-			return positionInChart;
-		}
-
-		public void setPositionInChart(long positionInChart) {
-			this.positionInChart = positionInChart;
 		}
 
 		public List<TradesResponse> getTrades() {
@@ -135,12 +117,12 @@ public class CandlestickMapReduce {
 			this.volume = volume;
 		}
 		
-		public Timeframe getTimeframe() {
-			return timeframe;
+		public Index getIndex() {
+			return index;
 		}
 		
-		public void setTimeframe(Timeframe timeframe) {
-			this.timeframe = timeframe;
+		public void setIndex(Index index) {
+			this.index = index;
 		}
 
 	}
