@@ -8,8 +8,12 @@ public class Index {
 
 	public Index(long millis, Timeframe timeframe) {
 		this.millis = millis;
-		this.positionInChart = Math.floorDiv(millis, timeframe.getSeconds());
+		this.positionInChart = millisToPosition(millis, timeframe);
 		this.timeframe = timeframe;
+	}
+	
+	public static long millisToPosition(long millis, Timeframe timeframe) {
+		return Math.floorDiv(millis, timeframe.getSeconds());
 	}
 
 	@Override
