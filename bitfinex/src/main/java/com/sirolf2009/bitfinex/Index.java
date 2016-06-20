@@ -2,9 +2,12 @@ package com.sirolf2009.bitfinex;
 
 public class Index {
 	
-	private final long millis;
-	private final long positionInChart;
-	private final Timeframe timeframe;
+	private long millis;
+	private long positionInChart;
+	private Timeframe timeframe;
+	
+	public Index() {
+	}
 
 	public Index(long millis, Timeframe timeframe) {
 		this.millis = millis;
@@ -32,5 +35,18 @@ public class Index {
 	public Timeframe getTimeframe() {
 		return timeframe;
 	}
+
+	public void setMillis(long millis) {
+		this.millis = millis;
+	}
+
+	public void setPositionInChart(long positionInChart) {
+		this.positionInChart = positionInChart;
+	}
+
+	public void setTimeframe(Timeframe timeframe) {
+		this.timeframe = timeframe;
+	}
+
 
 }

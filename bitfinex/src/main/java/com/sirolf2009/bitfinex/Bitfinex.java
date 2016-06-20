@@ -11,12 +11,12 @@ import org.apache.http.impl.client.HttpClients;
 import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 import com.sirolf2009.bitfinex.calls.BitfinexCall;
 import com.sirolf2009.bitfinex.calls.Lendbook;
-import com.sirolf2009.bitfinex.calls.Trades;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
-import com.sirolf2009.bitfinex.calls.Stats;
-import com.sirolf2009.bitfinex.calls.Stats.StatsResponse;
 import com.sirolf2009.bitfinex.calls.Pubticker;
 import com.sirolf2009.bitfinex.calls.Pubticker.TickerResponse;
+import com.sirolf2009.bitfinex.calls.Stats;
+import com.sirolf2009.bitfinex.calls.Stats.StatsResponse;
+import com.sirolf2009.bitfinex.calls.Trades;
 import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 import com.sirolf2009.bitfinex.calls.auth.MarginInfos;
 import com.sirolf2009.bitfinex.calls.auth.MarginInfos.MarginInfosResponse;
@@ -41,12 +41,24 @@ public class Bitfinex {
 		new Thread(new Ticker(this, symbols, refreshRate, tradeconsumer)).start();
 	}
 	
-	public void candleTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
-		new CandlestickTicker(this, symbols, refreshRate, timeframe, candleconsumer);
+	public void candleTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleConsumer) {
+		new Thread(new Ticker(this, symbols, refreshRate, new CandlestickTicker(timeframe, candleConsumer))).start();
 	}
 	
 	public void heikenAshiTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
-		new HACandleTicker(this, symbols, refreshRate, timeframe, candleconsumer);
+		new Thread(new Ticker(this, symbols, refreshRate, new CandlestickTicker(timeframe, new HACandleTicker(candleconsumer)))).start();
+	}
+	
+	public void historyTicker(Consumer<TradesResponse> tradeconsumer) {
+		new HistoryTicker(tradeconsumer);
+	}
+	
+	public void historyCandleTicker(Timeframe timeframe, Consumer<CandleStick> candleConsumer) {
+		new HistoryTicker(new CandlestickTicker(timeframe, candleConsumer));
+	}
+	
+	public void historyHeikenAshiTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
+		new HistoryTicker(new CandlestickTicker(timeframe, new HACandleTicker(candleconsumer)));
 	}
 	
 	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe) throws BitfinexCallException {

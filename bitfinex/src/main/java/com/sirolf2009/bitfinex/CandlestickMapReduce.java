@@ -35,6 +35,7 @@ public class CandlestickMapReduce {
 		candle.setIndex(new Index(Math.min(candle1.index.getMillis(), candle2.index.getMillis()), candle1.getIndex().getTimeframe()));
 		candle.setTrades(candle1.getTrades());
 		candle.getTrades().addAll(candle2.getTrades());
+		calculateOHLCV(candle);
 		return candle;
 	}
 
@@ -62,7 +63,17 @@ public class CandlestickMapReduce {
 		public CandleStick(TradesResponse trade, Timeframe timeframe) {
 			trades = new ArrayList<TradesResponse>();
 			trades.add(trade);
+			open = trade;
+			high = trade;
+			low = trade;
+			close = trade;
 			this.index = new Index(trade.getTimestamp(), timeframe);
+		}
+		
+		@Override
+		public String toString() {
+			return "CandleStick [trades=" + trades + ", open=" + open + ", high=" + high + ", low=" + low + ", close="
+					+ close + ", volume=" + volume + ", index=" + index + "]";
 		}
 
 		public double getOHLC4() {

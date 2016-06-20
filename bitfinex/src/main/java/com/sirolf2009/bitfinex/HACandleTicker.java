@@ -4,19 +4,20 @@ import java.util.function.Consumer;
 
 import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 
-public class HACandleTicker {
+public class HACandleTicker implements Consumer<CandleStick> {
 
 	private CandleStick previousHACandle;
+	private Consumer<CandleStick> haCandleConsumer;
 
-	public HACandleTicker(Bitfinex bitfinex, Symbols symbol, long refreshRate, Timeframe timeframe,	Consumer<CandleStick> haCandleConsumer) {
-		new CandlestickTicker(bitfinex, symbol, refreshRate, timeframe, new Consumer<CandleStick>() {
-			@Override
-			public void accept(CandleStick t) {
-				CandleStick haCandle = CandlestickHeikenAshi.asHeikenAshi(t, previousHACandle);
-				haCandleConsumer.accept(haCandle);
-				previousHACandle = haCandle;
-			}
-		});
+	public HACandleTicker(Consumer<CandleStick> haCandleConsumer) {
+		this.haCandleConsumer = haCandleConsumer;
+	}
+	
+	@Override
+	public void accept(CandleStick t) {
+		CandleStick haCandle = CandlestickHeikenAshi.asHeikenAshi(t, previousHACandle);
+		haCandleConsumer.accept(haCandle);
+		previousHACandle = haCandle;
 	}
 
 }

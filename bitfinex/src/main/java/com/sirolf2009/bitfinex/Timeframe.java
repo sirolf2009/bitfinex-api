@@ -4,6 +4,9 @@ public class Timeframe {
 	
 	private long millis;
 	
+	public Timeframe() {
+	}
+	
 	public Timeframe(long millis) {
 		this.millis = millis;
 	}
