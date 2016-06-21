@@ -1,31 +1,48 @@
 package com.sirolf2009.bitfinex;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 public class Index {
 	
-	private long millis;
+	private long seconds;
 	private long positionInChart;
 	private Timeframe timeframe;
 	
 	public Index() {
 	}
 
-	public Index(long millis, Timeframe timeframe) {
-		this.millis = millis;
-		this.positionInChart = millisToPosition(millis, timeframe);
+	public Index(long seconds, Timeframe timeframe) {
+		this.seconds = seconds;
+		this.positionInChart = secondsToPosition(seconds, timeframe);
 		this.timeframe = timeframe;
 	}
 	
-	public static long millisToPosition(long millis, Timeframe timeframe) {
-		return Math.floorDiv(millis, timeframe.getSeconds());
+	public static long secondsToPosition(long seconds, Timeframe timeframe) {
+		return Math.floorDiv(seconds, timeframe.getSeconds());
+	}
+	
+	public Date getDate() {
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		cal.setTimeInMillis(seconds*1000);
+		return cal.getTime();
+	}
+	
+	public String getDateUTC() {
+		SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return format.format(getDate());
 	}
 
 	@Override
 	public String toString() {
-		return "Index [millis=" + millis + ", positionInChart=" + positionInChart + ", timeframe=" + timeframe + "]";
+		return "Index [seconds=" + seconds + ", positionInChart=" + positionInChart + ", timeframe=" + timeframe + "]";
 	}
 
-	public long getMillis() {
-		return millis;
+	public long getSeconds() {
+		return seconds;
 	}
 
 	public long getPositionInChart() {
@@ -36,8 +53,8 @@ public class Index {
 		return timeframe;
 	}
 
-	public void setMillis(long millis) {
-		this.millis = millis;
+	public void setSeconds(long seconds) {
+		this.seconds = seconds;
 	}
 
 	public void setPositionInChart(long positionInChart) {

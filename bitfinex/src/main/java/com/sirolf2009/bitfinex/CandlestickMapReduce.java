@@ -32,7 +32,7 @@ public class CandlestickMapReduce {
 	
 	public static CandleStick merge(CandleStick candle1, CandleStick candle2) {
 		CandleStick candle = new CandleStick();
-		candle.setIndex(new Index(Math.min(candle1.index.getMillis(), candle2.index.getMillis()), candle1.getIndex().getTimeframe()));
+		candle.setIndex(new Index(Math.min(candle1.index.getSeconds(), candle2.index.getSeconds()), candle1.getIndex().getTimeframe()));
 		candle.setTrades(candle1.getTrades());
 		candle.getTrades().addAll(candle2.getTrades());
 		calculateOHLCV(candle);

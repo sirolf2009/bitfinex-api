@@ -2,22 +2,22 @@ package com.sirolf2009.bitfinex;
 
 public class Timeframe {
 	
-	private long millis;
+	private long seconds;
 	
 	public Timeframe() {
 	}
 	
-	public Timeframe(long millis) {
-		this.millis = millis;
+	public Timeframe(long seconds) {
+		this.seconds = seconds;
 	}
 	
 
 	public static Timeframe minute() {
-		return new Timeframe(1000*60);
+		return new Timeframe(60);
 	}
 	
 	public static Timeframe minutes(int count) {
-		return new Timeframe(1000*60*count);
+		return new Timeframe(60*count);
 	}
 	
 	public static Timeframe hour() {
@@ -29,20 +29,12 @@ public class Timeframe {
 	}
 	
 
-	public long getMillis() {
-		return millis;
-	}
-
-	public void setMillis(long millis) {
-		this.millis = millis;
-	}
-	
 	public long getSeconds() {
-		return millis/1000;
-	}
-	
-	public void setSeconds(long seconds) {
-		this.millis = seconds*1000;
+		return seconds;
 	}
 
+	public void setSeconds(long seconds) {
+		this.seconds = seconds;
+	}
+	
 }

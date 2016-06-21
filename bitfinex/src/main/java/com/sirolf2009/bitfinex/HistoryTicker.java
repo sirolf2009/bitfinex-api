@@ -1,9 +1,9 @@
 package com.sirolf2009.bitfinex;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
@@ -15,7 +15,7 @@ public class HistoryTicker {
 	
 	public HistoryTicker(Consumer<TradesResponse> tradeConsumer) {
 		try {
-			reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new URL("http://api.bitcoincharts.com/v1/csv/bitfinexUSD.csv.gz").openStream())));
+			reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream("/home/sirolf2009/Downloads/bitfinexUSD.csv.gz")))); //TODO download to temp directory, delete when finished
 			String line;
 			while((line = reader.readLine()) != null) {
 				String[] data = line.split(",");

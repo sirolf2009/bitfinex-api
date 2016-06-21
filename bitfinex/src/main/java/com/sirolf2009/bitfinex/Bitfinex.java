@@ -57,7 +57,7 @@ public class Bitfinex {
 		new HistoryTicker(new CandlestickTicker(timeframe, candleConsumer));
 	}
 	
-	public void historyHeikenAshiTicker(Symbols symbols, long refreshRate, Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
+	public void historyHeikenAshiTicker(Timeframe timeframe, Consumer<CandleStick> candleconsumer) {
 		new HistoryTicker(new CandlestickTicker(timeframe, new HACandleTicker(candleconsumer)));
 	}
 	
