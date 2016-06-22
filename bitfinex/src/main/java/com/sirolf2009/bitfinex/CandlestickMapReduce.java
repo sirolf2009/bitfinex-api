@@ -72,7 +72,7 @@ public class CandlestickMapReduce {
 		
 		@Override
 		public String toString() {
-			return "CandleStick [trades=" + trades + ", open=" + open + ", high=" + high + ", low=" + low + ", close="
+			return "CandleStick [dateUTC="+index.getDateUTC()+", trades=" + trades + ", open=" + open + ", high=" + high + ", low=" + low + ", close="
 					+ close + ", volume=" + volume + ", index=" + index + "]";
 		}
 
