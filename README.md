@@ -29,6 +29,7 @@ The project also contains some utility methods. They are methods not supported b
 - ticker - Creates a listener for new trades
 - candleTicker - creates a listener for new candlesticks for a certain timeframe
 - heikenAshiTicker - creates a listener for new heiken ashi candlesticks for a certain timeframe
+- getSentiment - return a sentiment in percentages for a given symbol
 
 ## Examples
 
