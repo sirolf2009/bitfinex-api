@@ -20,6 +20,7 @@ The following calls are supported:
 - margin_infos
 - new_order
 - trades
+- lends
 
 The project also contains some utility methods. They are methods not supported by the REST api, but are there for convenience. The following utillity calls are supported.
 - marginBuyMarket - Place a market buy order for a certain amount
