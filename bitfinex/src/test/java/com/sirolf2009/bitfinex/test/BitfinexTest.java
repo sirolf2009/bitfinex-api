@@ -122,5 +122,13 @@ public class BitfinexTest {
 		responses.forEach(response -> assertTrue(response.getRate() > 0));
 		responses.forEach(response -> assertTrue(response.getTimestamp() > 0));
 	}
-
+	
+	@Test
+	public void testSentiment() throws BitfinexCallException {
+		double sentiment = bitfinex.getSentiment(Symbols.BTCUSD);
+		System.out.println(sentiment);
+		assertTrue(sentiment >= 0);
+		assertTrue(sentiment <= 100);
+	}
+ 
 }

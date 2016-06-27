@@ -28,7 +28,6 @@ import com.sirolf2009.bitfinex.calls.auth.NewOrder.NewOrderResponse;
 import com.sirolf2009.bitfinex.calls.auth.OrderStatus;
 import com.sirolf2009.bitfinex.calls.auth.OrderStatus.OrderStatusResponse;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
-import com.sirolf2009.bitfinex.exceptions.BitfinexInitializationException;
 
 public class Bitfinex {
 	
@@ -78,6 +77,14 @@ public class Bitfinex {
 	
 	public List<CandleStick> getCandlesticks(Symbols symbol, Timeframe timeframe, int count, long timestamp) throws BitfinexCallException {
 		return CandlestickMapReduce.mapReduce(timeframe, trades(symbol, count, timestamp));
+	}
+	
+	public double getSentiment(Symbols symbol) throws BitfinexCallException {
+		double amount1 = lends(symbol.getCurrency1()).get(0).getAmount_used();
+		double amount2 = lends(symbol.getCurrency2()).get(0).getAmount_used();
+		double spot = trades(symbol).get(0).getPrice();
+		amount1 = amount1*spot;
+		return amount2/(amount1+amount2)*100;
 	}
 	
 	/* LOW LEVEL FUNCTIONS */
@@ -160,12 +167,4 @@ public class Bitfinex {
 		}
 	}
 	
-	public static void main(String[] args) {
-		try {
-			Config.loadConfig("bitfinex_api.properties");
-		} catch (BitfinexInitializationException e) {
-			e.printStackTrace();
-		}
-	}
-
 }
