@@ -1,6 +1,7 @@
 package com.sirolf2009.bitfinex;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -12,6 +13,8 @@ import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 import com.sirolf2009.bitfinex.calls.BitfinexCall;
 import com.sirolf2009.bitfinex.calls.Lendbook;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
+import com.sirolf2009.bitfinex.calls.Lends;
+import com.sirolf2009.bitfinex.calls.Lends.LendsResponse;
 import com.sirolf2009.bitfinex.calls.Pubticker;
 import com.sirolf2009.bitfinex.calls.Pubticker.TickerResponse;
 import com.sirolf2009.bitfinex.calls.Stats;
@@ -117,6 +120,16 @@ public class Bitfinex {
 
 	public OrderStatusResponse orderStatus(int orderID) throws BitfinexCallException {
 		return (OrderStatusResponse) call(new OrderStatus(orderID));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<LendsResponse> lends(Currencies currency) throws BitfinexCallException {
+		return (List<LendsResponse>) call(new Lends(currency));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<LendsResponse> lends(Currencies currency, Date date, int count) throws BitfinexCallException {
+		return (List<LendsResponse>) call(new Lends(currency, date, count));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -36,5 +36,5 @@ public class CallUtils {
 			throw new BitfinexCallException("Could not create the stream", e);
 		}
 	}
-
+	
 }

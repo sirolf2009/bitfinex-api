@@ -16,9 +16,10 @@ import com.sirolf2009.bitfinex.Symbols;
 import com.sirolf2009.bitfinex.Timeframe;
 import com.sirolf2009.bitfinex.calls.Lendbook.LendbookResponse;
 import com.sirolf2009.bitfinex.calls.Lendbook.Loan;
+import com.sirolf2009.bitfinex.calls.Lends.LendsResponse;
+import com.sirolf2009.bitfinex.calls.Pubticker.TickerResponse;
 import com.sirolf2009.bitfinex.calls.Stats.Stat;
 import com.sirolf2009.bitfinex.calls.Stats.StatsResponse;
-import com.sirolf2009.bitfinex.calls.Pubticker.TickerResponse;
 import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 import com.sirolf2009.bitfinex.exceptions.BitfinexCallException;
 
@@ -109,6 +110,17 @@ public class BitfinexTest {
 		assertTrue("period > 0", loan.getPeriod() > 0);
 		assertTrue("rate > 0", loan.getRate() > 0);
 		assertTrue("frr == yes || frr == no", loan.getFrr().equals("Yes") || loan.getFrr().equals("No"));
+	}
+	
+	@Test
+	public void testLends() throws BitfinexCallException {
+		List<LendsResponse> responses = bitfinex.lends(Currencies.BTC);
+		System.out.println(responses);
+		assertTrue(responses.size() > 0);
+		responses.forEach(response -> assertTrue(response.getAmount_lent() > 0));
+		responses.forEach(response -> assertTrue(response.getAmount_used() > 0));
+		responses.forEach(response -> assertTrue(response.getRate() > 0));
+		responses.forEach(response -> assertTrue(response.getTimestamp() > 0));
 	}
 
 }
