@@ -24,6 +24,10 @@ public class Index {
 		return Math.floorDiv(seconds, timeframe.getSeconds());
 	}
 	
+	public long positionInTimeframe(Timeframe timeframe) {
+		return secondsToPosition(seconds, timeframe);
+	}
+	
 	public Date getDate() {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		cal.setTimeInMillis(seconds*1000);

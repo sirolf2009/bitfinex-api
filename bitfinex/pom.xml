@@ -3,7 +3,31 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sirolf2009</groupId>
 	<artifactId>bitfinex</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
+	<name>Bitfinex API</name>
+	<url>https://github.com/sirolf2009/bitfinex-api</url>
+	<description>An API to acces the bitfinex REST API</description>
+	
+	<developers>
+		<developer>
+			<email>masterflappie@gmail.com</email>
+			<name>Floris Thijssen</name>
+			<url>https://github.com/sirolf2009</url>
+		</developer>
+	</developers>
+	
+	<scm>
+        <connection>scm:git:git@github.com:sirolf2009/bitfinex-api.git</connection>
+        <developerConnection>scm:git:git@github.com:sirolf2009/bitfinex-api.git</developerConnection>
+        <url>git@github.com:sirolf2009/bitfinex-api.git</url>
+    </scm>
+	
+	<licenses>
+		<license>
+			<name>ODC Public Domain Dedication &amp; License 1.0</name>
+			<url>http://www.spdx.org/licenses/PDDL-1.0</url>
+		</license>
+	</licenses>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -126,6 +150,17 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.3</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
