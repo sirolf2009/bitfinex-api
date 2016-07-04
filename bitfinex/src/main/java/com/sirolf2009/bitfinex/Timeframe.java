@@ -27,7 +27,28 @@ public class Timeframe {
 	public static Timeframe hours(int count) {
 		return minutes(60*count);
 	}
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (seconds ^ (seconds >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Timeframe other = (Timeframe) obj;
+		if (seconds != other.seconds)
+			return false;
+		return true;
+	}
 
 	public long getSeconds() {
 		return seconds;
