@@ -1,5 +1,7 @@
 package com.sirolf2009.bitfinex;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +79,12 @@ public class CandlestickMapReduce {
 		}
 
 		public double getOHLC4() {
-			return (open.getPrice()+high.getPrice()+low.getPrice()+close.getPrice())/4;
+			DecimalFormat priceFormat = new DecimalFormat("######.############");
+			BigDecimal open = new BigDecimal(this.open.getPrice());
+			BigDecimal high = new BigDecimal(this.high.getPrice());
+			BigDecimal low = new BigDecimal(this.low.getPrice());
+			BigDecimal close = new BigDecimal(this.close.getPrice());
+			return Double.parseDouble(priceFormat.format(open.add(high).add(low).add(close).divide(new BigDecimal(4)).doubleValue()));
 		}
 
 		public List<TradesResponse> getTrades() {
