@@ -35,8 +35,12 @@ public class Index {
 	}
 	
 	public String getDateUTC() {
+		return getDate("UTC");
+	}
+	
+	public String getDate(String timezone) {
 		SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		format.setTimeZone(TimeZone.getTimeZone(timezone));
 		return format.format(getDate());
 	}
 
