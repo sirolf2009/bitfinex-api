@@ -6,7 +6,7 @@ import java.util.List;
 import com.sirolf2009.bitfinex.CandlestickMapReduce.CandleStick;
 import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 
-public class CandlestickHeikenAshi {
+public strictfp class CandlestickHeikenAshi {
 	
 	public static List<CandleStick> heikenAshi(List<CandleStick> candlesticks) {
 		List<CandleStick> HACandles = new ArrayList<CandleStick>(candlesticks.size());

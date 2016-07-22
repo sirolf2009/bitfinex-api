@@ -51,7 +51,7 @@ public class Trades extends HttpGet implements BitfinexCall {
 			return "TradesResponse [tid=" + tid + ", timestamp=" + timestamp + ", price=" + price + ", amount=" + amount
 					+ ", exchange=" + exchange + ", type=" + type + "]";
 		}
-
+		
 		public int getTid() {
 			return tid;
 		}

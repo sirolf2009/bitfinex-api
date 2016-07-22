@@ -1,6 +1,5 @@
 package com.sirolf2009.bitfinex;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +12,13 @@ import com.sirolf2009.bitfinex.calls.Trades.TradesResponse;
 public class CandlestickMapReduce {
 
 	public static List<CandleStick> mapReduce(Timeframe timeFrame, List<TradesResponse> trades) {
-		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame)).collect(Collectors.groupingBy((CandleStick candle) -> candle.getIndex().getPositionInChart()));
+		Map<Long, List<CandleStick>> candles = trades.stream().map(trade -> new CandleStick(trade, timeFrame))
+				.collect(Collectors.groupingBy((CandleStick candle) -> candle.getIndex().getPositionInChart()));
 		Map<Long, CandleStick> reducedCandles = new HashMap<Long, CandleStick>();
-		for(Entry<Long, List<CandleStick>> entry : candles.entrySet()) {
+		for (Entry<Long, List<CandleStick>> entry : candles.entrySet()) {
 			CandleStick reducedCandle = null;
-			for(CandleStick candle : entry.getValue()) {
-				if(reducedCandle == null) {
+			for (CandleStick candle : entry.getValue()) {
+				if (reducedCandle == null) {
 					reducedCandle = candle;
 				} else {
 					reducedCandle = merge(reducedCandle, candle);
@@ -28,12 +28,15 @@ public class CandlestickMapReduce {
 		}
 		reducedCandles.values().forEach(candle -> calculateOHLCV(candle));
 
-		return reducedCandles.values().stream().sorted((trade1, trade2) -> new Long(trade1.open.getTimestamp()).compareTo(trade2.open.getTimestamp())).collect(Collectors.toList());
+		return reducedCandles.values().stream()
+				.sorted((trade1, trade2) -> new Long(trade1.open.getTimestamp()).compareTo(trade2.open.getTimestamp()))
+				.collect(Collectors.toList());
 	}
-	
+
 	public static CandleStick merge(CandleStick candle1, CandleStick candle2) {
 		CandleStick candle = new CandleStick();
-		candle.setIndex(new Index(Math.min(candle1.index.getSeconds(), candle2.index.getSeconds()), candle1.getIndex().getTimeframe()));
+		candle.setIndex(new Index(Math.min(candle1.index.getSeconds(), candle2.index.getSeconds()),
+				candle1.getIndex().getTimeframe()));
 		candle.setTrades(candle1.getTrades());
 		candle.getTrades().addAll(candle2.getTrades());
 		calculateOHLCV(candle);
@@ -41,15 +44,19 @@ public class CandlestickMapReduce {
 	}
 
 	public static void calculateOHLCV(CandleStick candle) {
-		candle.open = candle.getTrades().stream().min((trade1, trade2) -> new Long(trade1.getTimestamp()).compareTo(trade2.getTimestamp())).get();
-		candle.high = candle.getTrades().stream().max((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
-		candle.low = candle.getTrades().stream().min((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
-		candle.close = candle.getTrades().stream().max((trade1, trade2) -> new Long(trade1.getTimestamp()).compareTo(trade2.getTimestamp())).get();
+		candle.open = candle.getTrades().stream()
+				.min((trade1, trade2) -> new Long(trade1.getTimestamp()).compareTo(trade2.getTimestamp())).get();
+		candle.high = candle.getTrades().stream()
+				.max((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
+		candle.low = candle.getTrades().stream()
+				.min((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
+		candle.close = candle.getTrades().stream()
+				.max((trade1, trade2) -> new Long(trade2.getTimestamp()).compareTo(trade1.getTimestamp())).get();
 		candle.volume = candle.getTrades().stream().mapToDouble(trade -> trade.getAmount()).sum();
 	}
 
 	public static class CandleStick {
-		
+
 		private List<TradesResponse> trades;
 		private TradesResponse open;
 		private TradesResponse high;
@@ -70,19 +77,16 @@ public class CandlestickMapReduce {
 			close = trade;
 			this.index = new Index(trade.getTimestamp(), timeframe);
 		}
-		
+
 		@Override
 		public String toString() {
-			return "CandleStick [dateUTC="+index.getDateUTC()+", trades=" + trades + ", open=" + open + ", high=" + high + ", low=" + low + ", close="
-					+ close + ", volume=" + volume + ", index=" + index + "]";
+			return "CandleStick [dateUTC=" + index.getDateUTC() + ", open=" + open.getPrice() + ", high="
+					+ high.getPrice() + ", low=" + low.getPrice() + ", close=" + close.getPrice() + ", volume=" + volume
+					+ ", index=" + index + "]";
 		}
 
 		public double getOHLC4() {
-			BigDecimal open = new BigDecimal(this.open.getPrice());
-			BigDecimal high = new BigDecimal(this.high.getPrice());
-			BigDecimal low = new BigDecimal(this.low.getPrice());
-			BigDecimal close = new BigDecimal(this.close.getPrice());
-			return open.add(high).add(low).add(close).divide(new BigDecimal(4)).doubleValue();
+			return (this.open.getPrice() + this.high.getPrice() + this.low.getPrice() + this.close.getPrice()) / 4;
 		}
 
 		public List<TradesResponse> getTrades() {
@@ -132,11 +136,11 @@ public class CandlestickMapReduce {
 		public void setVolume(double volume) {
 			this.volume = volume;
 		}
-		
+
 		public Index getIndex() {
 			return index;
 		}
-		
+
 		public void setIndex(Index index) {
 			this.index = index;
 		}
