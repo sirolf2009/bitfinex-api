@@ -51,7 +51,7 @@ public class CandlestickMapReduce {
 		candle.low = candle.getTrades().stream()
 				.min((trade1, trade2) -> new Double(trade1.getPrice()).compareTo(trade2.getPrice())).get();
 		candle.close = candle.getTrades().stream()
-				.max((trade1, trade2) -> new Long(trade2.getTimestamp()).compareTo(trade1.getTimestamp())).get();
+				.max((trade1, trade2) -> new Long(trade1.getTimestamp()).compareTo(trade2.getTimestamp())).get();
 		candle.volume = candle.getTrades().stream().mapToDouble(trade -> trade.getAmount()).sum();
 	}
 
