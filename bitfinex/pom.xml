@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sirolf2009</groupId>
 	<artifactId>bitfinex</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>Bitfinex API</name>
 	<url>https://github.com/sirolf2009/bitfinex-api</url>
 	<description>An API to acces the bitfinex REST API</description>
