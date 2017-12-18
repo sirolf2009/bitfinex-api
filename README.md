@@ -3,6 +3,7 @@
 # bitfinex-api
 
 This project is a wrapper for the bitfinex REST api. Along with some higher level functions such as tickers.
+There is a WIP project that will eventually do the same as this library, but with websockets. You can find it here https://github.com/sirolf2009/bitfinex-wss
 
 ## Authorized and unauthorized
 
